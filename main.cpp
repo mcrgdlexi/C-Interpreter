@@ -38,7 +38,8 @@ bool B(string* x, int len){
         answer.pop();
         return a;
     }
-    return false;
+    cout << "Error: Missing . and the end of the statement" << endl;
+    exit(-1);
 }
 
 // IT := OT IT_Tail
@@ -46,18 +47,27 @@ void IT(string* x, int len){
     bool o = false;
     for(int i=0; i<len; i++){
         if(x[i] == "("){
+            o = true;
             for(int j=i+1; j<len; j++){
                 if(x[j] == ")"){
                     OT(x, j+1);
                     IT_Tail(x+j+2, len-j-1);
                 }
             }
-            break;
         }
-        if(x[i] == "->"){
+        if(x[i] == "->" and !o){
+            if(i-1 < 0){
+                cout << "Error: Non-Boolean value on the left side of ->" << endl;
+                exit(-1);
+            }
+            if(len == i+1){
+                cout << "Error: Non-Boolean value on the right side of ->" << endl;
+                exit(-1);
+            }
             o = true;
             OT(x, i);
             IT_Tail(x+i, len-i);
+            
         }
     }
     if(!o)
@@ -69,28 +79,49 @@ void IT(string* x, int len){
 void IT_Tail(string* x, int len){
     bool o = false;
     if(len == 0)
-        answer.push(true);
-    for(int i=0; i<=len; i++){
-        if(x[i] == "->"){
-            o = true;
+        o = true;
+    else if(len == 2 and x[0] == "->"){
+        o = true;
+        if(!answer.top()){
+            answer.pop();
+            answer.push(true);
+        }
+        else{
+            OT(x+1, 1);
             if(!answer.top()){
+                answer.pop();
+                answer.pop();
+                answer.push(false);
+            }
+            else{
+                answer.pop();
                 answer.pop();
                 answer.push(true);
             }
-            else{
-                IT_Tail(x+i+1, len);
+        }
+    }
+    else{
+        for(int i=0; i<=len; i++){
+            if(x[i] == "->"){
+                o = true;
                 if(!answer.top()){
-                    answer.pop();
-                    answer.pop();
-                    answer.push(false);
-                }
-                else{
-                    answer.pop();
                     answer.pop();
                     answer.push(true);
                 }
+                else{
+                    IT_Tail(x+i+1, len);
+                    if(!answer.top()){
+                        answer.pop();
+                        answer.pop();
+                        answer.push(false);
+                    }
+                    else{
+                        answer.pop();
+                        answer.pop();
+                        answer.push(true);
+                    }
+                }
             }
-            break;
         }
     }
     if(!o)
@@ -102,15 +133,23 @@ void OT(string* x, int len){
     bool o = false;
     for(int i=0; i<len; i++){
         if(x[i] == "("){
+            o = true;
             for(int j=i+1; j<len; j++){
                 if(x[j] == ")"){
                     AT(x, j+1);
                     OT_Tail(x+j+2, len-j-1);
                 }
             }
-            break;
         }
-        if(x[i] == "v"){
+        if(x[i] == "v" and !o){
+            if(i-1 < 0){
+                cout << "Error: Non-Boolean value on the left side of v" << endl;
+                exit(-1);
+            }
+            if(len == i+1){
+                cout << "Error: Non-Boolean value on the right side of v" << endl;
+                exit(-1);
+            }
             o = true;
             AT(x, i);
             OT_Tail(x+i, len-i);
@@ -125,28 +164,49 @@ void OT(string* x, int len){
 void OT_Tail(string* x, int len){
     bool o = false;
     if(len == 0)
-        answer.push(true);
-    for(int i=0; i<len; i++){
-        if(x[i] == "v"){
-            o = true;
+        o = true;
+    else if(len == 2 and x[0] == "v"){
+        o = true;
+        if(answer.top()){
+            answer.pop();
+            answer.push(true);
+        }
+        else{
+            AT(x+1, 1);
             if(answer.top()){
+                answer.pop();
                 answer.pop();
                 answer.push(true);
             }
             else{
-                OT_Tail(x+i+1, len-i-1);
+                answer.pop();
+                answer.pop();
+                answer.push(false);
+            }
+        }
+    }
+    else{
+        for(int i=0; i<len; i++){
+            if(x[i] == "v"){
+                o = true;
                 if(answer.top()){
-                    answer.pop();
                     answer.pop();
                     answer.push(true);
                 }
                 else{
-                    answer.pop();
-                    answer.pop();
-                    answer.push(false);
+                    OT_Tail(x+i+1, len-i-1);
+                    if(answer.top()){
+                        answer.pop();
+                        answer.pop();
+                        answer.push(true);
+                    }
+                    else{
+                        answer.pop();
+                        answer.pop();
+                        answer.push(false);
+                    }
                 }
             }
-            break;
         }
     }
     if(!o)
@@ -158,15 +218,23 @@ void AT(string* x, int len){
     bool o = false;
     for(int i=0; i<len; i++){
         if(x[i] == "("){
+            o = true;
             for(int j=i+1; j<len; j++){
                 if(x[j] == ")"){
                     L(x, j+1);
                     AT_Tail(x+j+2, len-j-1);
                 }
             }
-            break;
         }
-        if(x[i] == "^"){
+        if(x[i] == "^" and !o){
+            if(i-1 < 0){
+                cout << "Error: Non-Boolean value on the left side of ^" << endl;
+                exit(-1);
+            }
+            if(len == i+1){
+                cout << "Error: Non-Boolean value on the right side of ^" << endl;
+                exit(-1);
+            }
             o = true;
             L(x, i);
             AT_Tail(x+i, len-i);
@@ -181,26 +249,48 @@ void AT(string* x, int len){
 void AT_Tail(string* x, int len){
     bool o = false;
     if(len == 0)
-        answer.push(true);
-    for(int i=0; i<len; i++){
-        if(x[i] == "^"){
-            o = true;
+        o = true;
+    else if(len == 2 and x[0] == "^"){
+        o = true;
+        if(answer.top()){
+            L(x+1, 1);
             if(answer.top()){
-                AT_Tail(x+i+1, len-i-1);
-                if(answer.top()){
-                    answer.pop();
-                    answer.pop();
-                    answer.push(true);
-                }
-                else{
-                    answer.pop();
-                    answer.pop();
-                    answer.push(false);
-                }
+                answer.pop();
+                answer.pop();
+                answer.push(true);
             }
             else{
                 answer.pop();
+                answer.pop();
                 answer.push(false);
+            }
+        }
+        else{
+            answer.pop();
+            answer.push(false);
+        }
+    }
+    else{
+        for(int i=0; i<len; i++){
+            if(x[i] == "^"){
+                o = true;
+                if(answer.top()){
+                    AT_Tail(x+i+1, len-i-1);
+                    if(answer.top()){
+                        answer.pop();
+                        answer.pop();
+                        answer.push(true);
+                    }
+                    else{
+                        answer.pop();
+                        answer.pop();
+                        answer.push(false);
+                    }
+                }
+                else{
+                    answer.pop();
+                    answer.push(false);
+                }
             }
         }
     }
@@ -212,7 +302,7 @@ void AT_Tail(string* x, int len){
 //   := ~L
 void L(string* x, int len){
     if(x[0] == "~"){
-        L(x+1, len);
+        L(x+1, len-1);
         bool a = answer.top();
         answer.pop();
         answer.push(!a);
@@ -225,15 +315,24 @@ void L(string* x, int len){
 //   := F
 //   := (IT)
 void A(string* x, int len){
-    if(x[0] == "T"){
+    if(x[0] == "T" and len == 1){
         answer.push(true);
     }
-    else if(x[0] == "F"){
+    else if(x[0] == "F" and len == 1){
         answer.push(false);
     }
-    else if(x[0] == "(")
+    else if(x[0] == "("){
         if(x[len-1] == ")")
             IT(x+1, len-2);
+        else{
+            cout << "Error: Missing )" << endl;
+            exit(-1);
+        }
+    }
+    else{
+        cout << "Error: Input is invalid." << endl;
+        exit(-1);
+    }
 }
 
 // function that splits a string into a string* by each symbol (->, ., ~, ^, v, (, ), T, F)
@@ -249,7 +348,8 @@ string* split(string str){
                 j++;
             }
             else{
-                error_code();
+                cout << "Error: Unknown character -" << endl;
+                exit(-1);
             }
         }
         else if(str[i] == '.'){
@@ -285,7 +385,8 @@ string* split(string str){
             j++;
         }
         else{
-            error_code();
+            cout << "Error: Unknown character " << str[i] << endl;
+            exit(-1);
         }
     }
     string* a = new string[j];
