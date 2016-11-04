@@ -51,12 +51,12 @@ void IT(string* x, int len){
             for(int j=i+1; j<len; j++){
                 if(x[j] == ")"){
                     OT(x, j+1);
-                    IT_Tail(x+j+2, len-j-1);
+                    IT_Tail(x+j+1, len-j-1);
                 }
             }
         }
         if(x[i] == "->" and !o){
-            if(i-1 < 0){
+            if(i-1 < 0 and answer.empty()){
                 cout << "Error: Non-Boolean value on the left side of ->" << endl;
                 exit(-1);
             }
@@ -65,7 +65,8 @@ void IT(string* x, int len){
                 exit(-1);
             }
             o = true;
-            OT(x, i);
+            if(i != 0)
+                OT(x, i);
             IT_Tail(x+i, len-i);
             
         }
@@ -137,12 +138,12 @@ void OT(string* x, int len){
             for(int j=i+1; j<len; j++){
                 if(x[j] == ")"){
                     AT(x, j+1);
-                    OT_Tail(x+j+2, len-j-1);
+                    OT_Tail(x+j+1, len-j-1);
                 }
             }
         }
         if(x[i] == "v" and !o){
-            if(i-1 < 0){
+            if(i-1 < 0 and answer.empty()){
                 cout << "Error: Non-Boolean value on the left side of v" << endl;
                 exit(-1);
             }
@@ -151,7 +152,8 @@ void OT(string* x, int len){
                 exit(-1);
             }
             o = true;
-            AT(x, i);
+            if(i != 0)
+                AT(x, i);
             OT_Tail(x+i, len-i);
         }
     }
@@ -222,12 +224,12 @@ void AT(string* x, int len){
             for(int j=i+1; j<len; j++){
                 if(x[j] == ")"){
                     L(x, j+1);
-                    AT_Tail(x+j+2, len-j-1);
+                    AT_Tail(x+j+1, len-j-1);
                 }
             }
         }
         if(x[i] == "^" and !o){
-            if(i-1 < 0){
+            if(i-1 < 0 and answer.empty()){
                 cout << "Error: Non-Boolean value on the left side of ^" << endl;
                 exit(-1);
             }
@@ -236,7 +238,8 @@ void AT(string* x, int len){
                 exit(-1);
             }
             o = true;
-            L(x, i);
+            if(i != 0)
+                L(x, i);
             AT_Tail(x+i, len-i);
         }
     }
@@ -315,6 +318,8 @@ void L(string* x, int len){
 //   := F
 //   := (IT)
 void A(string* x, int len){
+    //cout << len;
+    //cout << x[0];
     if(x[0] == "T" and len == 1){
         answer.push(true);
     }
